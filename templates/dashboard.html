@@ -1,0 +1,135 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | LuxeStay{% endblock %}
+{% block page_heading %}Dashboard Overview{% endblock %}
+
+{% block content %}
+
+<div class="welcome-banner">
+    <div>
+        <span class="welcome-label">HOTEL MANAGEMENT</span>
+        <h1>Welcome to LuxeStay ✨</h1>
+        <p>Manage your hotel operations from one place.</p>
+    </div>
+    <div class="welcome-icon">✦</div>
+</div>
+
+<div class="dashboard-cards">
+
+    <div class="stat-card">
+        <div class="stat-icon gold"><i class="fa-solid fa-bed"></i></div>
+        <div>
+            <p>Total Rooms</p>
+            <h2>{{ rooms }}</h2>
+            <small>Registered rooms</small>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+        <div>
+            <p>Total Customers</p>
+            <h2>{{ customers }}</h2>
+            <small>Registered guests</small>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-calendar-check"></i></div>
+        <div>
+            <p>Total Bookings</p>
+            <h2>{{ bookings }}</h2>
+            <small>All reservations</small>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div>
+            <p>Total Revenue</p>
+            <h2>₹{{ "%.2f"|format(revenue) }}</h2>
+            <small>Booking revenue</small>
+        </div>
+    </div>
+
+</div>
+
+<div class="dashboard-grid">
+
+    <div class="dashboard-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Recent Bookings</h3>
+                <p>Latest hotel reservations</p>
+            </div>
+            <a href="{{ url_for('bookings') }}">View All →</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Guest</th>
+                        <th>Room</th>
+                        <th>Check-in</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for booking in recent %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>{{ booking.name }}</td>
+                        <td>{{ booking.room_number }}</td>
+                        <td>{{ booking.check_in }}</td>
+                        <td>
+                            <span class="status-badge">{{ booking.status }}</span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            No bookings available yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dashboard-panel quick-panel">
+        <h3>Quick Actions</h3>
+        <p>Manage hotel operations easily.</p>
+
+        <a href="{{ url_for('rooms') }}" class="quick-action">
+            <i class="fa-solid fa-bed"></i>
+            <span>Add New Room</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <a href="{{ url_for('customers') }}" class="quick-action">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Add Customer</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <a href="{{ url_for('bookings') }}" class="quick-action">
+            <i class="fa-solid fa-calendar-plus"></i>
+            <span>Create Booking</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+        <a href="{{ url_for('restaurant') }}" class="quick-action">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Restaurant Orders</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

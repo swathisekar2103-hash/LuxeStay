@@ -1,0 +1,186 @@
+
+{% extends "base.html" %}
+
+{% block title %}Restaurant Management | LuxeStay{% endblock %}
+{% block page_heading %}Restaurant Management{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <div>
+        <h2>Restaurant Management</h2>
+        <p>Manage restaurant food items and customer orders.</p>
+    </div>
+</div>
+
+<div class="management-card">
+    <div class="card-heading">
+        <h3><i class="fa-solid fa-utensils"></i> Add Food Item</h3>
+    </div>
+
+    <form method="POST" action="{{ url_for('restaurant') }}" class="management-form">
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Food Item Name</label>
+                <input type="text" name="name"
+                       placeholder="Enter food name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category">
+                    <option value="">Select Category</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Snacks">Snacks</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Desserts">Desserts</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Price (₹)</label>
+                <input type="number" name="price"
+                       min="0" step="0.01"
+                       placeholder="Enter price" required>
+            </div>
+        </div>
+
+        <button type="submit" class="primary-btn">
+            <i class="fa-solid fa-plus"></i> Add Food Item
+        </button>
+    </form>
+</div>
+
+<div class="management-card">
+    <div class="card-heading">
+        <h3><i class="fa-solid fa-bowl-food"></i> Food Menu</h3>
+        <span class="count-label">{{ items|length }} Items</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="management-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Food Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Availability</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>#{{ item.id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.category or 'General' }}</td>
+                    <td>₹{{ "%.2f"|format(item.price) }}</td>
+                    <td>
+                        <span class="booking-status booked">
+                            {{ item.available }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No food items added yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="management-card">
+    <div class="card-heading">
+        <h3><i class="fa-solid fa-cart-plus"></i> Create Food Order</h3>
+    </div>
+
+    <form method="POST" action="{{ url_for('add_order') }}" class="management-form">
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" name="customer_name"
+                       placeholder="Enter customer name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Select Food Item</label>
+                <select name="item_id" required>
+                    <option value="">Choose Food Item</option>
+                    {% for item in items %}
+                    <option value="{{ item.id }}" {% if item.available != 'Yes' %}disabled{% endif %}>
+                        {{ item.name }} - ₹{{ item.price }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" name="quantity"
+                       min="1" value="1" required>
+            </div>
+        </div>
+
+        <button type="submit" class="primary-btn">
+            <i class="fa-solid fa-check"></i> Place Order
+        </button>
+    </form>
+</div>
+
+<div class="management-card">
+    <div class="card-heading">
+        <h3><i class="fa-solid fa-receipt"></i> Restaurant Orders</h3>
+        <span class="count-label">{{ orders|length }} Orders</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="management-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Food Item</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.food_name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>₹{{ "%.2f"|format(order.total) }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td>
+                        <span class="booking-status booked">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-message">
+                        No restaurant orders available.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | LuxeStay</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-body">
+
+<div class="login-container">
+
+    <div class="login-image">
+        <div class="image-overlay">
+            <h1>LuxeStay</h1>
+            <p>Luxury is not a place. It's an experience.</p>
+        </div>
+    </div>
+
+    <div class="login-form-section">
+
+        <div class="login-logo">✦ LuxeStay</div>
+
+        <h2>Welcome Back</h2>
+        <p class="login-subtitle">Sign in to your management dashboard</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <label>Username</label>
+            <input type="text" name="username"
+                   placeholder="Enter your username" required>
+
+            <label>Password</label>
+            <input type="password" name="password"
+                   placeholder="Enter your password" required>
+
+            <button type="submit" class="login-btn">
+                Sign In →
+            </button>
+
+        </form>
+
+        <p class="login-footer">
+            © 2026 LuxeStay. All rights reserved.
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>

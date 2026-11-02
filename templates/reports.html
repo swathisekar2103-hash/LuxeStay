@@ -1,0 +1,159 @@
+
+{% extends "base.html" %}
+
+{% block title %}Reports & Feedback | LuxeStay{% endblock %}
+{% block page_heading %}Reports & Feedback{% endblock %}
+
+{% block content %}
+
+<div class="page-intro">
+    <div>
+        <h2>Reports & Feedback</h2>
+        <p>View hotel performance and customer feedback.</p>
+    </div>
+</div>
+
+<!-- REPORT SUMMARY -->
+
+<div class="report-grid">
+
+    <div class="report-card">
+        <div class="report-icon revenue-icon">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+        </div>
+        <div>
+            <p>Total Hotel Revenue</p>
+            <h2>₹{{ "%.2f"|format(revenue or 0) }}</h2>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <div class="report-icon orders-icon">
+            <i class="fa-solid fa-utensils"></i>
+        </div>
+        <div>
+            <p>Total Restaurant Orders</p>
+            <h2>{{ total_orders }}</h2>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <div class="report-icon feedback-icon">
+            <i class="fa-solid fa-comments"></i>
+        </div>
+        <div>
+            <p>Total Customer Feedback</p>
+            <h2>{{ feedback|length }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<!-- CUSTOMER FEEDBACK FORM -->
+
+<div class="management-card">
+
+    <div class="card-heading">
+        <h3>
+            <i class="fa-solid fa-comment-dots"></i>
+            Add Customer Feedback
+        </h3>
+    </div>
+
+    <form method="POST"
+          action="{{ url_for('reports') }}"
+          class="management-form">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text"
+                       name="customer_name"
+                       placeholder="Enter customer name"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Rating</label>
+                <select name="rating" required>
+                    <option value="">Select Rating</option>
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="3">3 - Good</option>
+                    <option value="2">2 - Average</option>
+                    <option value="1">1 - Poor</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-group feedback-message">
+            <label>Feedback Message</label>
+            <textarea name="message"
+                      rows="4"
+                      placeholder="Write customer feedback..."></textarea>
+        </div>
+
+        <button type="submit" class="primary-btn">
+            <i class="fa-solid fa-paper-plane"></i>
+            Submit Feedback
+        </button>
+
+    </form>
+
+</div>
+
+<!-- FEEDBACK LIST -->
+
+<div class="management-card">
+
+    <div class="card-heading">
+        <h3>
+            <i class="fa-solid fa-star"></i>
+            Customer Feedback
+        </h3>
+
+        <span class="count-label">
+            {{ feedback|length }} Reviews
+        </span>
+    </div>
+
+    <div class="feedback-list">
+
+        {% for item in feedback %}
+
+        <div class="feedback-item">
+
+            <div class="feedback-top">
+                <div>
+                    <h4>{{ item.customer_name }}</h4>
+                    <span class="feedback-date">
+                        {{ item.created_at }}
+                    </span>
+                </div>
+
+                <div class="rating-stars">
+                    {% for star in range(item.rating|int) %}
+                        <i class="fa-solid fa-star"></i>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <p>{{ item.message or 'No written feedback provided.' }}</p>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-message">
+            No customer feedback available yet.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
