@@ -1,0 +1,5 @@
+venv/
+.env
+hotel.db
+__pycache__/
+*.pyc
