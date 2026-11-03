@@ -18,27 +18,33 @@
 
     <div class="management-card">
         <h3><i class="fa-solid fa-plus"></i> Add New Room</h3>
-        <p class="form-description">Enter the room details below.</p>
+        <p class="form-description">
+            Select a room type. Room ID and price will be generated automatically.
+        </p>
 
         <form method="POST" class="management-form">
 
-            <label>Room Number</label>
-            <input type="text" name="room_number"
-                   placeholder="Example: 101" required>
-
             <label>Room Type</label>
-            <select name="room_type" required>
+            <select name="room_type" id="room_type" required>
                 <option value="">Select Room Type</option>
-                <option>Standard Room</option>
-                <option>Deluxe Room</option>
-                <option>Luxury Suite</option>
-                <option>Executive Suite</option>
-                <option>Family Room</option>
+                <option value="Standard Room">Standard Room</option>
+                <option value="Deluxe Room">Deluxe Room</option>
+                <option value="Luxury Suite">Luxury Suite</option>
+                <option value="Executive Suite">Executive Suite</option>
+                <option value="Family Room">Family Room</option>
             </select>
 
-            <label>Price Per Night (₹)</label>
-            <input type="number" name="price"
-                   placeholder="Enter price" min="1" step="0.01" required>
+            <label>Automatic Room ID</label>
+            <input type="text"
+                   id="room_number"
+                   placeholder="Select room type"
+                   readonly>
+
+            <label>Automatic Price Per Night (₹)</label>
+            <input type="number"
+                   id="price"
+                   placeholder="Select room type"
+                   readonly>
 
             <label>Description</label>
             <textarea name="description"
@@ -59,17 +65,17 @@
 
         <div class="room-benefit">
             <i class="fa-solid fa-check"></i>
-            Manage room categories
+            Automatic Room ID
+        </div>
+
+        <div class="room-benefit">
+            <i class="fa-solid fa-check"></i>
+            Automatic Room Pricing
         </div>
 
         <div class="room-benefit">
             <i class="fa-solid fa-check"></i>
             Track room availability
-        </div>
-
-        <div class="room-benefit">
-            <i class="fa-solid fa-check"></i>
-            Maintain room pricing
         </div>
     </div>
 
@@ -89,7 +95,7 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Room No.</th>
+                    <th>Room ID</th>
                     <th>Room Type</th>
                     <th>Price / Night</th>
                     <th>Status</th>
@@ -128,5 +134,27 @@
     </div>
 
 </div>
+
+<script>
+const nextRoomNumbers = {{ next_room_numbers | tojson }};
+const roomPrices = {{ room_prices | tojson }};
+
+const roomType = document.getElementById("room_type");
+const roomNumber = document.getElementById("room_number");
+const price = document.getElementById("price");
+
+roomType.addEventListener("change", function () {
+
+    const selectedType = this.value;
+
+    if (selectedType && nextRoomNumbers[selectedType]) {
+        roomNumber.value = nextRoomNumbers[selectedType];
+        price.value = roomPrices[selectedType];
+    } else {
+        roomNumber.value = "";
+        price.value = "";
+    }
+});
+</script>
 
 {% endblock %}

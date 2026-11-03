@@ -163,6 +163,42 @@ def dashboard():
 
 
 # ROOM MANAGEMENT
+
+# ROOM MANAGEMENT
+
+ROOM_CONFIG = {
+    "Standard Room": ("STD", 1500),
+    "Deluxe Room": ("DLX", 2500),
+    "Luxury Suite": ("LUX", 3500),
+    "Executive Suite": ("EXE", 4500),
+    "Family Room": ("FAM", 5000)
+}
+
+
+def get_next_room_number(conn, room_type):
+
+    prefix = ROOM_CONFIG[room_type][0]
+
+    existing_rooms = conn.execute(
+        "SELECT room_number FROM rooms"
+    ).fetchall()
+
+    numbers = []
+
+    for room in existing_rooms:
+        room_number = room["room_number"]
+
+        if room_number.startswith(prefix + "-"):
+            try:
+                numbers.append(int(room_number.split("-")[-1]))
+            except ValueError:
+                pass
+
+    next_number = max(numbers, default=0) + 1
+
+    return f"{prefix}-{next_number:03d}"
+
+
 @app.route("/rooms", methods=["GET", "POST"])
 @login_required
 def rooms():
@@ -172,37 +208,70 @@ def rooms():
     if request.method == "POST":
 
         try:
+            room_type = request.form["room_type"]
+
+            if room_type not in ROOM_CONFIG:
+                raise ValueError("Invalid room type")
+
+            prefix, price = ROOM_CONFIG[room_type]
+
+            # Generate Room ID automatically
+            room_number = get_next_room_number(conn, room_type)
+
+            # Get automatic price from selected room type
             conn.execute("""
                 INSERT INTO rooms
                 (room_number, room_type, price, status, description)
                 VALUES (?, ?, ?, ?, ?)
             """, (
-                request.form["room_number"].strip(),
-                request.form["room_type"],
-                float(request.form["price"]),
+                room_number,
+                room_type,
+                price,
                 "Available",
-                request.form.get("description", "")
+                request.form.get("description", "").strip()
             ))
 
             conn.commit()
-            flash("Room added successfully.", "success")
 
-        except (ValueError, KeyError):
-            flash("Please enter valid room details.", "error")
+            flash(
+                f"Room {room_number} added successfully. Price: ₹{price}",
+                "success"
+            )
+
+        except ValueError:
+            flash("Please select a valid room type.", "error")
 
         except Exception:
-            flash("Room number may already exist.", "error")
+            conn.rollback()
+            flash("Room could not be added. Please try again.", "error")
 
-        conn.close()
+        finally:
+            conn.close()
+
         return redirect(url_for("rooms"))
 
     room_list = conn.execute(
         "SELECT * FROM rooms ORDER BY id DESC"
     ).fetchall()
 
+    next_room_numbers = {}
+
+    for room_type in ROOM_CONFIG:
+        next_room_numbers[room_type] = get_next_room_number(
+            conn, room_type
+        )
+
     conn.close()
 
-    return render_template("rooms.html", rooms=room_list)
+    return render_template(
+        "rooms.html",
+        rooms=room_list,
+        next_room_numbers=next_room_numbers,
+        room_prices={
+            room_type: details[1]
+            for room_type, details in ROOM_CONFIG.items()
+        }
+    )
 
 
 @app.route("/rooms/delete/<int:id>")
@@ -226,6 +295,7 @@ def delete_room(id):
     conn.close()
 
     return redirect(url_for("rooms"))
+
 
 
 # CUSTOMER MANAGEMENT
