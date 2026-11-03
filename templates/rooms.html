@@ -136,24 +136,29 @@
 </div>
 
 <script>
-const nextRoomNumbers = {{ next_room_numbers | tojson }};
-const roomPrices = {{ room_prices | tojson }};
+document.addEventListener("DOMContentLoaded", function () {
 
-const roomType = document.getElementById("room_type");
-const roomNumber = document.getElementById("room_number");
-const price = document.getElementById("price");
+    const nextRoomNumbers = {{ next_room_numbers | tojson }};
+    const roomPrices = {{ room_prices | tojson }};
 
-roomType.addEventListener("change", function () {
+    const roomType = document.getElementById("room_type");
+    const roomNumber = document.getElementById("room_number");
+    const price = document.getElementById("price");
 
-    const selectedType = this.value;
-
-    if (selectedType && nextRoomNumbers[selectedType]) {
-        roomNumber.value = nextRoomNumbers[selectedType];
-        price.value = roomPrices[selectedType];
-    } else {
-        roomNumber.value = "";
-        price.value = "";
+    if (!roomType || !roomNumber || !price) {
+        console.log("Room form elements not found");
+        return;
     }
+
+    roomType.addEventListener("change", function () {
+
+        const selectedType = this.value;
+
+        roomNumber.value = nextRoomNumbers[selectedType] || "";
+        price.value = roomPrices[selectedType] || "";
+
+    });
+
 });
 </script>
 
